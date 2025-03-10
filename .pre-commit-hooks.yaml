@@ -1,0 +1,31 @@
+- id: block-env-files
+  name: Block environment files
+  description: Prevents committing files like .env, .env.local, etc., which may contain sensitive information.
+  entry: block-files --type=env
+  language: python
+  stages: [pre-commit]
+  require_serial: true
+
+- id: block-dump-files
+  name: Block database dump files
+  description: Blocks database dumps (e.g., .sql, .dump) to avoid committing large or sensitive data.
+  entry: block-files --type=dump
+  language: python
+  stages: [pre-commit]
+  require_serial: true
+
+- id: block-log-files
+  name: Block log files
+  description: Prevents committing log files (e.g., .log, error_log) which are often temporary or sensitive.
+  entry: block-files --type=log
+  language: python
+  stages: [pre-commit]
+  require_serial: true
+
+- id: block-cache-files
+  name: Block cache files
+  description: Blocks cache files (e.g., .cache) to keep the repository clean and avoid unnecessary data.
+  entry: block-files --type=cache
+  language: python
+  stages: [pre-commit]
+  require_serial: true
