@@ -29,3 +29,11 @@
   language: python
   stages: [pre-commit]
   require_serial: true
+
+- id: block-debug-statements
+  name: Block debug statements
+  description: Prevents committing debug statements like var_dump, console.log, etc.
+  entry: block-debug-statements
+  language: python
+  stages: [pre-commit]
+  require_serial: true
