@@ -152,7 +152,6 @@ def main():
         print(f"Found debug statement{s} in the following file{s}:")
         for file, line_num, line in blocked_files:
             print(f"    - '{file}:{line_num}' - {line}")
-        print("Commit aborted. Please remove the debug statements and try again.")
         return 1
     return 0
 
