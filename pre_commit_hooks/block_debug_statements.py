@@ -193,19 +193,19 @@ def main():
             file_type = next(ft for ft, exts in file_extensions.items() if ext in exts)
             patterns = blocks[file_type]['patterns']
             comment_markers = blocks[file_type]['comment_markers']
-
+            
             if check_mode == 'full':
                 # Check the entire file
                 lines = get_all_lines(file)
-                for i, line in enumerate(lines, start=1):
+                for line_num, line in enumerate(lines, start=1):
                     if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, i, line.strip()))
+                        blocked_files.append((file, line_num, line.strip()))
             elif check_mode == 'diff':
                 # Check only modified lines
                 modified_lines = get_modified_lines(file)
                 for line_num, line in modified_lines:
                     if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, line_num, line))
+                        blocked_files.append((file, line_num, line.strip()))
     
     if blocked_files:
         s = 's' if len(blocked_files) > 1 else ''
