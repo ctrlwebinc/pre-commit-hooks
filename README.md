@@ -20,7 +20,7 @@ To use these hooks in your project, add the following to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.1.1  # Replace with the desired tag or commit hash
+  rev: v1.1.2  # Replace with the desired tag or commit hash
   hooks:
     - id: block-env-files
     - id: block-dump-files
@@ -62,6 +62,7 @@ Each hook supports the following optional arguments for customization:
 - **`--file-types`**: A pipe-separated list of file extensions to block (e.g., `php`, `js`, `php|js`).
 - **`--extra-patterns`**: A pipe-separated list of additional debug patterns to block (e.g., `die|exit`).
 - **`--exclude-patterns`**: A pipe-separated list of debug patterns to exclude (e.g., `console.info`).
+- **`--check-mode`**: `full` for a full check on the committed file, `diff` for a check on the modified lines only. (default is `full`)
 
 ## Example Usage
 
@@ -70,12 +71,12 @@ and block debug statements from `php` files, add this to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.1.1
+  rev: v1.1.2
   hooks:
     - id: block-dump-files
       args: [--extra-extensions=.txt|.exe, --exclude-extensions=.sql]
     - id: block-env-files
       args: [--exclude-names=.env.example]
     - id: block-debug-statements
-      args: [--file-types=php]
+      args: [--file-types=php, --check-mode=diff]
 ```
