@@ -146,8 +146,8 @@ def get_modified_lines(file):
             in_hunk = True
         elif in_hunk:
             if line.startswith('+'):
-                line_num += 1
                 modified_lines.append((line_num, line[1:].strip()))  # Added line
+                line_num += 1
             elif not line.startswith('-'):
                 line_num += 1  # Unchanged line
     return modified_lines
