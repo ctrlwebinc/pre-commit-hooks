@@ -29,6 +29,14 @@ def get_args():
         default='',
         help='Pipe-separated list of debug patterns to exclude (e.g., console.info)'
     )
+
+    parser.add_argument(
+        '--check-mode',
+        type=str,
+        default='full',
+        choices=['full', 'diff'],
+        help='Check mode: "full" to check entire file, "diff" to check only modified lines (default: full)'
+    )
     
     # Capture the staged files passed by pre-commit
     parser.add_argument(
@@ -112,10 +120,43 @@ def has_debug_statement(line, patterns, comment_markers):
             return True
     return False
 
+def get_modified_lines(file):
+    # Retrieve modified lines from the staged diff of the file
+    try:
+        result = subprocess.run(
+            ["git", "diff", "--cached", "--", file],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            encoding='utf-8',
+            check=True,
+        )
+        diff_output = result.stdout
+    except subprocess.CalledProcessError:
+        print(f"Warning: Could not retrieve diff for {file}. Skipping.")
+        return []
+    
+    modified_lines = []
+    line_num = 0
+    in_hunk = False
+    for line in diff_output.splitlines():
+        if line.startswith('@@'):
+            # Parse hunk header, e.g., @@ -10,5 +12,7 @@
+            hunk_info = line.split()[2]  # +12,7
+            line_num = int(hunk_info.split(',')[0][1:]) - 1  # Start at line 12
+            in_hunk = True
+        elif in_hunk:
+            if line.startswith('+'):
+                line_num += 1
+                modified_lines.append((line_num, line[1:].strip()))  # Added line
+            elif not line.startswith('-'):
+                line_num += 1  # Unchanged line
+    return modified_lines
+
 def main():
     args = get_args()
     staged_files = args.files
     blocks = get_blocks(args)
+    check_mode = args.check_mode
     
     # Map file types to their extensions
     file_extensions = {
@@ -136,21 +177,30 @@ def main():
             file_type = next(ft for ft, exts in file_extensions.items() if ext in exts)
             patterns = blocks[file_type]['patterns']
             comment_markers = blocks[file_type]['comment_markers']
-            try:
-                content = subprocess.run(
-                    ["git", "show", f":{file}"],
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL,
-                    encoding='utf-8',
-                    check=True,
-                ).stdout
-                lines = content.splitlines()
-                for i, line in enumerate(lines, start=1):
+
+            if check_mode == 'full':
+                # Check the entire file
+                try:
+                    content = subprocess.run(
+                        ["git", "show", f":{file}"],
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,
+                        encoding='utf-8',
+                        check=True,
+                    ).stdout
+                    lines = content.splitlines()
+                    for i, line in enumerate(lines, start=1):
+                        if has_debug_statement(line, patterns, comment_markers):
+                            blocked_files.append((file, i, line.strip()))
+                except subprocess.CalledProcessError:
+                    print(f"Warning: Could not read staged content of {file}. Skipping.")
+                    continue
+            elif check_mode == 'diff':
+                # Check only modified lines
+                modified_lines = get_modified_lines(file)
+                for line_num, line in modified_lines:
                     if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, i, line.strip()))
-            except subprocess.CalledProcessError:
-                print(f"Warning: Could not read staged content of {file}. Skipping.")
-                continue
+                        blocked_files.append((file, line_num, line))
     
     if blocked_files:
         s = 's' if len(blocked_files) > 1 else ''
