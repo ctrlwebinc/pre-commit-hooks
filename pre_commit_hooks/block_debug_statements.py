@@ -42,24 +42,24 @@ def get_args():
 
 def get_defaults(file_type: str):
     if file_type == "php":
-        default_patterns = [
+        default_patterns = (
             'var_dump',
             'print_r',
             'dd',
-        ]
+        )
         default_comment_markers = (
             '//',
             '#',
         )
     elif file_type == "js":
-        default_patterns = [
+        default_patterns = (
             'console.log',
-        ]
+        )
         default_comment_markers = (
             '//',
         )
     else:
-        default_patterns = []
+        default_patterns = ()
         default_comment_markers = ()
     
     defaults = {
