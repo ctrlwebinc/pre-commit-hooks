@@ -152,12 +152,28 @@ def get_modified_lines(file):
                 line_num += 1  # Unchanged line
     return modified_lines
 
+def get_all_lines(file):
+    lines = []
+    try:
+        content = subprocess.run(
+            ["git", "show", f":{file}"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            encoding='utf-8',
+            check=True,
+        )
+        lines = content.stdout
+    except subprocess.CalledProcessError:
+        print(f"Warning: Could not retrieve file {file}. Skipping.")
+        return []
+    return lines
+
 def main():
     args = get_args()
     staged_files = args.files
     blocks = get_blocks(args)
     check_mode = args.check_mode
-    
+
     # Map file types to their extensions
     file_extensions = {
         'php': ('.php', '.blade.php'),
@@ -180,21 +196,10 @@ def main():
 
             if check_mode == 'full':
                 # Check the entire file
-                try:
-                    content = subprocess.run(
-                        ["git", "show", f":{file}"],
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.DEVNULL,
-                        encoding='utf-8',
-                        check=True,
-                    ).stdout
-                    lines = content.splitlines()
-                    for i, line in enumerate(lines, start=1):
-                        if has_debug_statement(line, patterns, comment_markers):
-                            blocked_files.append((file, i, line.strip()))
-                except subprocess.CalledProcessError:
-                    print(f"Warning: Could not read staged content of {file}. Skipping.")
-                    continue
+                lines = get_all_lines(file)
+                for i, line in enumerate(lines, start=1):
+                    if has_debug_statement(line, patterns, comment_markers):
+                        blocked_files.append((file, i, line.strip()))
             elif check_mode == 'diff':
                 # Check only modified lines
                 modified_lines = get_modified_lines(file)
