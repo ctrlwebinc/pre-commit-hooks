@@ -42,31 +42,27 @@ def get_args():
 
 def get_defaults(file_type: str):
     if file_type == "php":
-        default_functions = (
+        default_patterns = [
             'var_dump',
             'print_r',
             'dd',
-        )
-        default_patterns = [r'{}\s*\('.format(func) for func in default_functions]
+        ]
         default_comment_markers = (
             '//',
             '#',
         )
     elif file_type == "js":
-        default_patterns = (
+        default_patterns = [
             'console.log',
-        )
-        default_patterns = [r'{}\s*\('.format(func) for func in default_functions]
+        ]
         default_comment_markers = (
             '//',
         )
     else:
-        default_patterns = ()
         default_patterns = []
         default_comment_markers = ()
     
     defaults = {
-        "functions": default_functions,
         "patterns": default_patterns,
         "comment_markers": default_comment_markers,
     }
@@ -95,22 +91,13 @@ def get_blocks(args):
     
     for file_type in file_types:
         defaults = get_defaults(file_type)
-        default_functions = defaults['functions']
-        default_patterns = defaults['patterns']
+        patterns = tuple(set(defaults['patterns'] + extras['patterns']) - set(excludes['patterns']))
 
-        # Filter default patterns by excluding matching function names
-        filtered_default_patterns = [
-            pattern for func, pattern in zip(default_functions, default_patterns)
-            if func not in excludes
-        ]
-
-        # Filter extra patterns and convert to regex
-        filtered_extras = [func for func in extras if func not in excludes]
-        extra_patterns = [r'{}\s*\('.format(func) for func in filtered_extras]
+        filtered_patterns = [r'{}\s*\('.format(func) for func in patterns]
 
         # Combine patterns
         blocks[file_type] = {
-            'patterns': tuple(filtered_default_patterns + extra_patterns),
+            'patterns': filtered_patterns,
             'comment_markers': defaults['comment_markers'],
         }
     
