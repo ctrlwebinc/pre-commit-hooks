@@ -162,7 +162,7 @@ def get_all_lines(file):
             encoding='utf-8',
             check=True,
         )
-        lines = content.stdout
+        lines = content.stdout.splitlines()
     except subprocess.CalledProcessError:
         print(f"Warning: Could not retrieve file {file}. Skipping.")
         return []
