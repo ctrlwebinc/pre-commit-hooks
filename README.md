@@ -20,7 +20,7 @@ To use these hooks in your project, add the following to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.1.0  # Replace with the desired tag or commit hash
+  rev: v1.1.1  # Replace with the desired tag or commit hash
   hooks:
     - id: block-env-files
     - id: block-dump-files
@@ -70,7 +70,7 @@ and block debug statements from `php` files, add this to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.1.0
+  rev: v1.1.1
   hooks:
     - id: block-dump-files
       args: [--extra-extensions=.txt|.exe, --exclude-extensions=.sql]
