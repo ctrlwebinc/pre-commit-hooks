@@ -142,13 +142,13 @@ def get_modified_lines(file):
         if line.startswith('@@'):
             # Parse hunk header, e.g., @@ -10,5 +12,7 @@
             hunk_info = line.split()[2]  # +12,7
-            line_num = int(hunk_info.split(',')[0][1:]) - 1  # Start at line 12
+            line_num = int(hunk_info.split(',')[0][1:])  # Start at line 12
             in_hunk = True
         elif in_hunk:
             if line.startswith('+'):
                 modified_lines.append((line_num, line[1:].strip()))  # Added line
                 line_num += 1
-            elif not line.startswith('-'):
+            elif not line.startswith(' '):
                 line_num += 1  # Unchanged line
     return modified_lines
 
