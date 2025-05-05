@@ -153,7 +153,7 @@ def get_modified_lines(file):
     return modified_lines
 
 def get_all_lines(file):
-    lines = []
+    file_lines = []
     try:
         content = subprocess.run(
             ["git", "show", f":{file}"],
@@ -162,11 +162,16 @@ def get_all_lines(file):
             encoding='utf-8',
             check=True,
         )
-        lines = content.stdout.splitlines()
+        lines = content.stdout
     except subprocess.CalledProcessError:
         print(f"Warning: Could not retrieve file {file}. Skipping.")
         return []
-    return lines
+    
+    line_num = 1
+    for line in lines.splitlines():
+        file_lines.append((line_num, line.strip()))
+        line_num += 1
+    return file_lines
 
 def main():
     args = get_args()
@@ -197,15 +202,15 @@ def main():
             if check_mode == 'full':
                 # Check the entire file
                 lines = get_all_lines(file)
-                for line_num, line in enumerate(lines, start=1):
+                for line_num, line in lines:
                     if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, line_num, line.strip()))
+                        blocked_files.append((file, line_num, line))
             elif check_mode == 'diff':
                 # Check only modified lines
                 modified_lines = get_modified_lines(file)
                 for line_num, line in modified_lines:
                     if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, line_num, line.strip()))
+                        blocked_files.append((file, line_num, line))
     
     if blocked_files:
         s = 's' if len(blocked_files) > 1 else ''
