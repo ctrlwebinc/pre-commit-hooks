@@ -66,6 +66,7 @@ def get_defaults(file_type: str):
         default_comment_markers = ()
     
     defaults = {
+        "functions": default_functions,
         "patterns": default_patterns,
         "comment_markers": default_comment_markers,
     }
