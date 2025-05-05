@@ -42,24 +42,27 @@ def get_args():
 
 def get_defaults(file_type: str):
     if file_type == "php":
-        default_patterns = (
-            r'var_dump\s*\(',
-            r'print_r\s*\(',
-            r'dd\s*\(',
+        default_functions = (
+            'var_dump',
+            'print_r',
+            'dd',
         )
+        default_patterns = [r'{}\s*\('.format(func) for func in default_functions]
         default_comment_markers = (
             '//',
             '#',
         )
     elif file_type == "js":
         default_patterns = (
-            r'console\.log\s*\(',
+            'console.log',
         )
+        default_patterns = [r'{}\s*\('.format(func) for func in default_functions]
         default_comment_markers = (
             '//',
         )
     else:
         default_patterns = ()
+        default_patterns = []
         default_comment_markers = ()
     
     defaults = {
@@ -91,8 +94,22 @@ def get_blocks(args):
     
     for file_type in file_types:
         defaults = get_defaults(file_type)
+        default_functions = defaults['functions']
+        default_patterns = defaults['patterns']
+
+        # Filter default patterns by excluding matching function names
+        filtered_default_patterns = [
+            pattern for func, pattern in zip(default_functions, default_patterns)
+            if func not in excludes
+        ]
+
+        # Filter extra patterns and convert to regex
+        filtered_extras = [func for func in extras if func not in excludes]
+        extra_patterns = [r'{}\s*\('.format(func) for func in filtered_extras]
+
+        # Combine patterns
         blocks[file_type] = {
-            'patterns': tuple(set(defaults['patterns'] + extras['patterns']) - set(excludes['patterns'])),
+            'patterns': tuple(filtered_default_patterns + extra_patterns),
             'comment_markers': defaults['comment_markers'],
         }
     
