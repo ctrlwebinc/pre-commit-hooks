@@ -199,18 +199,15 @@ def main():
             patterns = blocks[file_type]['patterns']
             comment_markers = blocks[file_type]['comment_markers']
             
-            if check_mode == 'full':
-                # Check the entire file
+            lines = []
+            if check_mode == 'full': # Check the entire file
                 lines = get_all_lines(file)
-                for line_num, line in lines:
-                    if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, line_num, line))
-            elif check_mode == 'diff':
-                # Check only modified lines
-                modified_lines = get_modified_lines(file)
-                for line_num, line in modified_lines:
-                    if has_debug_statement(line, patterns, comment_markers):
-                        blocked_files.append((file, line_num, line))
+            elif check_mode == 'diff': # Check only modified lines
+                lines = get_modified_lines(file)
+
+            for line_num, line in lines:
+                if has_debug_statement(line, patterns, comment_markers):
+                    blocked_files.append((file, line_num, line))
     
     if blocked_files:
         s = 's' if len(blocked_files) > 1 else ''
