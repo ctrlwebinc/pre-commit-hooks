@@ -10,6 +10,7 @@ The following hooks are available:
 - **`block-dump-files`**: Blocks database dump files.
 - **`block-log-files`**: Blocks log files.
 - **`block-cache-files`**: Blocks cache files.
+- **`block-debug-statements`**: Blocks cache files.
 
 Each hook can be customized with optional arguments to adjust its behavior (see [Arguments](#arguments) below).
 
@@ -19,12 +20,13 @@ To use these hooks in your project, add the following to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.0.0  # Replace with the desired tag or commit hash
+  rev: v1.1.0  # Replace with the desired tag or commit hash
   hooks:
     - id: block-env-files
     - id: block-dump-files
     - id: block-log-files
     - id: block-cache-files
+    - id: block-debug-statements
 ```
 
 ## Hook Details
@@ -41,10 +43,14 @@ To use these hooks in your project, add the following to your `.pre-commit-confi
 ### `block-cache-files`
 - **Default Behavior**: Blocks files with the `.cache` extension.
 
+### `block-debug-statements`
+- **Default Behavior**: Blocks commits that contains debug statements for PHP and JS files.
+
 ## Arguments
 
 Each hook supports the following optional arguments for customization:
 
+### For 'block-*-files' hooks:
 - **`--extra-extensions`**: A pipe-separated list of additional file extensions to block (e.g., `.bak|.tar|.gz`).
 - **`--exclude-extensions`**: A pipe-separated list of file extensions to exclude from blocking (e.g., `.log|.txt`).
 - **`--extra-names`**: A pipe-separated list of additional full file names to block (e.g., `file1.bak|file2.tar`).
@@ -52,16 +58,24 @@ Each hook supports the following optional arguments for customization:
 - **`--extra-prefixes`**: A pipe-separated list of additional file name prefixes to block (e.g., `env|secrets`).
 - **`--exclude-prefixes`**: A pipe-separated list of file name prefixes to exclude from blocking (e.g., `test_|dev_`).
 
+### For 'block-debug-statements' hooks:
+- **`--file-types`**: A pipe-separated list of file extensions to block (e.g., `php`, `js`, `php|js`).
+- **`--extra-patterns`**: A pipe-separated list of additional debug patterns to block (e.g., `die|exit`).
+- **`--exclude-patterns`**: A pipe-separated list of debug patterns to exclude (e.g., `console.info`).
+
 ## Example Usage
 
-To customize the `block-dump-files` hook to block `.txt` and `.exe` files while excluding `.sql` files and to allow `.env.example` for the `block-env-files` hook, add this to your `.pre-commit-config.yaml`:
+To customize the `block-dump-files` hook to block `.txt` and `.exe` files while excluding `.sql` files and to allow `.env.example` for the `block-env-files` hook,
+and block debug statements from `php` files, add this to your `.pre-commit-config.yaml`:
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.0.0
+  rev: v1.1.0
   hooks:
     - id: block-dump-files
       args: [--extra-extensions=.txt|.exe, --exclude-extensions=.sql]
     - id: block-env-files
       args: [--exclude-names=.env.example]
+    - id: block-debug-statements
+      args: [--file-types=php]
 ```
