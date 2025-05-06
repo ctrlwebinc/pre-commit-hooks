@@ -70,8 +70,8 @@ Each hook supports the following optional arguments for customization:
 - **`--check-mode`**: `full` for a full check on the committed file, `diff` for a check on the modified lines only. (default is `full`)
 
 ### For 'block-insecure-code' hook:
-- **`--extra-patterns`**: A pipe-separated list of additional patterns to block.
-- **`--exclude-patterns`**: A pipe-separated list of patterns to exclude.
+- **`--extra-functions`**: A pipe-separated list of additional functions to block.
+- **`--exclude-functions`**: A pipe-separated list of functions to exclude.
 
 ## Example Usage
 
@@ -88,4 +88,5 @@ and block debug statements from `php` files, add this to your `.pre-commit-confi
       args: [--exclude-names=.env.example]
     - id: block-debug-statements
       args: [--file-types=php, --check-mode=diff]
+    - id: block-insecure-code
 ```
