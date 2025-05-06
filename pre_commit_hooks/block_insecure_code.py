@@ -35,7 +35,7 @@ def get_args():
 
 def get_defaults():
     default_functions = (
-        'eval'
+        'eval',
     )
     default_comment_markers = (
         '//',
