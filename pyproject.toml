@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pre-commit-hooks"
-version = "1.0.0"
+version = "1.2.0"
 description = "Custom pre-commit hooks to block specific file types"
 readme = "README.md"
 requires-python = ">=3.6"
@@ -12,6 +12,7 @@ requires-python = ">=3.6"
 [project.scripts]
 block-files = "pre_commit_hooks.block_files:main"
 block-debug-statements = "pre_commit_hooks.block_debug_statements:main"
+block-insecure-code = "pre_commit_hooks.block_insecure_code:main"
 
 [tool.setuptools]
 packages = ["pre_commit_hooks"]

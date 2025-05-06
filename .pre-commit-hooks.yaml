@@ -37,3 +37,11 @@
   language: python
   stages: [pre-commit]
   require_serial: true
+
+- id: block-insecure-code
+  name: Block insecure code
+  description: Prevents committing insecure functions like eval.
+  entry: block-insecure-code
+  language: python
+  stages: [pre-commit]
+  require_serial: true

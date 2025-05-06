@@ -11,6 +11,7 @@ The following hooks are available:
 - **`block-log-files`**: Blocks log files.
 - **`block-cache-files`**: Blocks cache files.
 - **`block-debug-statements`**: Blocks cache files.
+- **`block-insecure-code`**: Blocks insecure code.
 
 Each hook can be customized with optional arguments to adjust its behavior (see [Arguments](#arguments) below).
 
@@ -20,13 +21,14 @@ To use these hooks in your project, add the following to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.1.2  # Replace with the desired tag or commit hash
+  rev: v1.2.0  # Replace with the desired tag or commit hash
   hooks:
     - id: block-env-files
     - id: block-dump-files
     - id: block-log-files
     - id: block-cache-files
     - id: block-debug-statements
+    - id: block-insecure-code
 ```
 
 ## Hook Details
@@ -46,6 +48,9 @@ To use these hooks in your project, add the following to your `.pre-commit-confi
 ### `block-debug-statements`
 - **Default Behavior**: Blocks commits that contains debug statements for PHP and JS files.
 
+### `block-insecure-code`
+- **Default Behavior**: Blocks  risky function `eval()` for PHP and JS files.
+
 ## Arguments
 
 Each hook supports the following optional arguments for customization:
@@ -58,11 +63,15 @@ Each hook supports the following optional arguments for customization:
 - **`--extra-prefixes`**: A pipe-separated list of additional file name prefixes to block (e.g., `env|secrets`).
 - **`--exclude-prefixes`**: A pipe-separated list of file name prefixes to exclude from blocking (e.g., `test_|dev_`).
 
-### For 'block-debug-statements' hooks:
+### For 'block-debug-statements' hook:
 - **`--file-types`**: A pipe-separated list of file extensions to block (e.g., `php`, `js`, `php|js`).
 - **`--extra-patterns`**: A pipe-separated list of additional debug patterns to block (e.g., `die|exit`).
 - **`--exclude-patterns`**: A pipe-separated list of debug patterns to exclude (e.g., `console.info`).
 - **`--check-mode`**: `full` for a full check on the committed file, `diff` for a check on the modified lines only. (default is `full`)
+
+### For 'block-insecure-code' hook:
+- **`--extra-patterns`**: A pipe-separated list of additional patterns to block.
+- **`--exclude-patterns`**: A pipe-separated list of patterns to exclude.
 
 ## Example Usage
 
@@ -71,7 +80,7 @@ and block debug statements from `php` files, add this to your `.pre-commit-confi
 
 ```yaml
 - repo: https://github.com/ctrlwebinc/pre-commit-hooks
-  rev: v1.1.2
+  rev: v1.2.0
   hooks:
     - id: block-dump-files
       args: [--extra-extensions=.txt|.exe, --exclude-extensions=.sql]
